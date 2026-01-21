@@ -1,11 +1,12 @@
 import streamlit as st
-import openai
 import json
 
 # ---------- CONFIG ----------
 st.set_page_config(page_title="AI Text-to-Design", layout="wide")
+
 st.title("AI-Assisted Text-to-Design Tool")
 st.caption("Early-stage conceptual design | Educational use only")
+st.warning("⚠️ Conceptual schematic only. Final validation by a qualified engineer is required.")
 
 st.markdown("---")
 
@@ -16,40 +17,60 @@ user_input = st.text_area(
     height=150
 )
 
-# ---------- AI FUNCTION ----------
-def extract_design(text):
-    prompt = f"""
-You are an AI assistant for early-stage engineering design.
+# ---------- MOCK AI FUNCTION ----------
+def mock_ai_parser(text):
+    text = text.lower()
 
-Allowed components:
-Pump, Tank, Valve, Filter, Pipe
+    components = []
+    if "pump" in text:
+        components.append("Pump")
+    if "filter" in text:
+        components.append("Filter")
+    if "tank" in text:
+        components.append("Tank")
+    if "valve" in text:
+        components.append("Valve")
 
-From the user text, extract:
-1. Components used (only from allowed list)
-2. Flow connections in order
+    connections = []
+    for i in range(len(components) - 1):
+        connections.append([components[i], components[i + 1]])
 
-Return ONLY valid JSON in this format:
-{{
-  "components": ["Pump", "Filter", "Tank"],
-  "connections": [["Pump", "Filter"], ["Filter", "Tank"]]
-}}
+    return {
+        "components": components,
+        "connections": connections
+    }
 
-User text:
-{text}
-"""
-    response = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",
-        messages=[{"role": "user", "content": prompt}]
-    )
+# ---------- RULE VALIDATION ----------
+def validate_design(data):
+    warnings = []
 
-    return response.choices[0].message.content
+    if len(data["components"]) < 2:
+        warnings.append("System should have at least two connected components.")
+
+    if len(data["connections"]) == 0:
+        warnings.append("No valid flow connections detected.")
+
+    return warnings
 
 # ---------- ACTION ----------
 if st.button("Generate Design"):
     if not user_input.strip():
         st.warning("Please enter a system description.")
     else:
-        st.info("Analyzing input using AI...")
-        result = extract_design(user_input)
+        st.info("Analyzing input (AI-assisted logic)...")
+
+        design = mock_ai_parser(user_input)
+        warnings = validate_design(design)
+
         st.subheader("Structured Design Output")
-        st.code(result, language="json")
+        st.json(design)
+
+        if warnings:
+            st.subheader("Validation Warnings")
+            for w in warnings:
+                st.warning(w)
+        else:
+            st.success("Design passed basic validation checks.")
+
+        st.markdown("---")
+        st.caption("Note: AI logic simulated for prototype demonstration.")
