@@ -1,25 +1,22 @@
 import streamlit as st
-import json
 
-
-
-# ---------- CONFIG ----------
+# ---------------- PAGE CONFIG ----------------
 st.set_page_config(page_title="AI Text-to-Design", layout="wide")
 
 st.title("AI-Assisted Text-to-Design Tool")
-st.caption("Early-stage conceptual design | Educational use only")
-st.warning("⚠️ Conceptual schematic only. Final validation by a qualified engineer is required.")
+st.caption("Prototype for Generative Engineering Design")
+st.warning("⚠️ Conceptual output only. Final designs must be validated by certified engineers.")
 
 st.markdown("---")
 
-# ---------- INPUT ----------
+# ---------------- INPUT ----------------
 user_input = st.text_area(
     "Describe your system in plain English",
-    placeholder="Example: Water system with pump, filter, and tank",
+    placeholder="Example: Water system with pump, filter and tank",
     height=150
 )
 
-# ---------- MOCK AI FUNCTION ----------
+# ---------------- MOCK AI PARSER ----------------
 def mock_ai_parser(text):
     text = text.lower()
 
@@ -41,11 +38,25 @@ def mock_ai_parser(text):
         "components": components,
         "connections": connections
     }
+
+# ---------------- RULE VALIDATION ----------------
+def validate_design(data):
+    warnings = []
+
+    if len(data["components"]) < 2:
+        warnings.append("System should contain at least two components.")
+
+    if not data["connections"]:
+        warnings.append("No flow connections detected between components.")
+
+    return warnings
+
+# ---------------- FLOW DIAGRAM (NO EXTRA LIBS) ----------------
 def draw_flow(design):
     comps = design["components"]
 
     if not comps:
-        st.info("No components to visualize.")
+        st.info("No components available to visualize.")
         return
 
     cols = st.columns(len(comps))
@@ -59,44 +70,51 @@ def draw_flow(design):
                     padding:20px;
                     text-align:center;
                     border-radius:10px;
-                    font-weight:bold;">
+                    font-weight:bold;
+                    background-color:#F9FFF9;">
                     {comp}
                 </div>
                 """,
                 unsafe_allow_html=True
             )
 
-        if i < len(comps) - 1:
-            st.markdown("<h2 style='text-align:center;'>➡️</h2>", unsafe_allow_html=True)
+# ---------------- EXPLANATION PANEL ----------------
+def explain_design(design):
+    explanation = []
 
-# ---------- RULE VALIDATION ----------
-def validate_design(data):
-    warnings = []
+    if "Pump" in design["components"]:
+        explanation.append("Pump initiates flow and maintains required pressure.")
 
-    if len(data["components"]) < 2:
-        warnings.append("System should have at least two connected components.")
+    if "Filter" in design["components"]:
+        explanation.append("Filter removes impurities to protect downstream components.")
 
-    if len(data["connections"]) == 0:
-        warnings.append("No valid flow connections detected.")
+    if "Tank" in design["components"]:
+        explanation.append("Tank provides storage and balances demand fluctuations.")
 
-    return warnings
+    if not explanation:
+        explanation.append("Basic system detected. Add more components for better functionality.")
 
-# ---------- ACTION ----------
+    return explanation
+
+# ---------------- MAIN ACTION ----------------
 if st.button("Generate Design"):
     if not user_input.strip():
         st.warning("Please enter a system description.")
     else:
-        st.info("Analyzing input (AI-assisted logic)...")
+        st.success("Input processed successfully")
 
         design = mock_ai_parser(user_input)
         warnings = validate_design(design)
 
         st.subheader("Structured Design Output")
         st.json(design)
-        st.subheader("System Flow Diagram")
-        diagram = generate_diagram(design)
-        st.graphviz_chart(diagram)
 
+        st.subheader("System Flow Diagram")
+        draw_flow(design)
+
+        st.subheader("Design Explanation")
+        for line in explain_design(design):
+            st.write("•", line)
 
         if warnings:
             st.subheader("Validation Warnings")
@@ -106,35 +124,8 @@ if st.button("Generate Design"):
             st.success("Design passed basic validation checks.")
 
         st.markdown("---")
-        st.caption("Note: AI logic simulated for prototype demonstration.")
-        st.subheader("System Flow Diagram")
-        draw_flow(design)
-
-def generate_diagram(design):
-     dot = Digraph()
-
-     for comp in design["components"]:
-        dot.node(comp, comp)
-
-     for conn in design["connections"]:
-        dot.edge(conn[0], conn[1])
-
-     return dot
-def explain_design(design):
-     explanation = []
-
-     if "Pump" in design["components"]:
-        explanation.append("Pump initiates flow and maintains pressure.")
-
-     if "Filter" in design["components"]:
-        explanation.append("Filter removes impurities before storage or distribution.")
-
-     if "Tank" in design["components"]:
-        explanation.append("Tank provides storage and balances demand fluctuations.")
-
-     return explanation
-st.subheader("Design Explanation")
-for line in explain_design(design):
-    st.write("•", line)
-
-
+        st.caption(
+            "Note: AI logic is simulated for prototype demonstration. "
+            "In real-world deployment, this module would be powered by a trained LLM "
+            "and integrated with CAD/BIM tools."
+        )
