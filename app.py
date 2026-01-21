@@ -67,8 +67,8 @@ if st.button("Generate Design"):
         st.subheader("Structured Design Output")
         st.json(design)
         st.subheader("System Flow Diagram")
-diagram = generate_diagram(design)
-st.graphviz_chart(diagram)
+        diagram = generate_diagram(design)
+        st.graphviz_chart(diagram)
 
 
         if warnings:
