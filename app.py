@@ -1,6 +1,6 @@
 import streamlit as st
 import json
-from graphviz import Digraph
+
 
 
 # ---------- CONFIG ----------
@@ -41,6 +41,33 @@ def mock_ai_parser(text):
         "components": components,
         "connections": connections
     }
+def draw_flow(design):
+    comps = design["components"]
+
+    if not comps:
+        st.info("No components to visualize.")
+        return
+
+    cols = st.columns(len(comps))
+
+    for i, comp in enumerate(comps):
+        with cols[i]:
+            st.markdown(
+                f"""
+                <div style="
+                    border:2px solid #4CAF50;
+                    padding:20px;
+                    text-align:center;
+                    border-radius:10px;
+                    font-weight:bold;">
+                    {comp}
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
+
+        if i < len(comps) - 1:
+            st.markdown("<h2 style='text-align:center;'>➡️</h2>", unsafe_allow_html=True)
 
 # ---------- RULE VALIDATION ----------
 def validate_design(data):
@@ -80,6 +107,9 @@ if st.button("Generate Design"):
 
         st.markdown("---")
         st.caption("Note: AI logic simulated for prototype demonstration.")
+        st.subheader("System Flow Diagram")
+draw_flow(design)
+
     def generate_diagram(design):
      dot = Digraph()
 
