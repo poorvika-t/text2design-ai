@@ -81,28 +81,28 @@ if st.button("Generate Design"):
         st.markdown("---")
         st.caption("Note: AI logic simulated for prototype demonstration.")
     def generate_diagram(design):
-    dot = Digraph()
+     dot = Digraph()
 
-    for comp in design["components"]:
+     for comp in design["components"]:
         dot.node(comp, comp)
 
-    for conn in design["connections"]:
+     for conn in design["connections"]:
         dot.edge(conn[0], conn[1])
 
-    return dot
-        def explain_design(design):
-    explanation = []
+     return dot
+    def explain_design(design):
+     explanation = []
 
-    if "Pump" in design["components"]:
+     if "Pump" in design["components"]:
         explanation.append("Pump initiates flow and maintains pressure.")
 
-    if "Filter" in design["components"]:
+     if "Filter" in design["components"]:
         explanation.append("Filter removes impurities before storage or distribution.")
 
-    if "Tank" in design["components"]:
+     if "Tank" in design["components"]:
         explanation.append("Tank provides storage and balances demand fluctuations.")
 
-    return explanation
+     return explanation
 st.subheader("Design Explanation")
 for line in explain_design(design):
     st.write("•", line)
