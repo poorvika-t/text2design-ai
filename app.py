@@ -108,9 +108,9 @@ if st.button("Generate Design"):
         st.markdown("---")
         st.caption("Note: AI logic simulated for prototype demonstration.")
         st.subheader("System Flow Diagram")
-draw_flow(design)
+        draw_flow(design)
 
-    def generate_diagram(design):
+def generate_diagram(design):
      dot = Digraph()
 
      for comp in design["components"]:
@@ -120,7 +120,7 @@ draw_flow(design)
         dot.edge(conn[0], conn[1])
 
      return dot
-    def explain_design(design):
+def explain_design(design):
      explanation = []
 
      if "Pump" in design["components"]:
