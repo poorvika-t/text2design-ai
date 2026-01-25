@@ -59,24 +59,30 @@ def draw_flow(design):
         st.info("No components available to visualize.")
         return
 
-    cols = st.columns(len(comps))
+    html = "<div style='display:flex; align-items:center; justify-content:center;'>"
 
     for i, comp in enumerate(comps):
-        with cols[i]:
-            st.markdown(
-                f"""
-                <div style="
-                    border:2px solid #4CAF50;
-                    padding:20px;
-                    text-align:center;
-                    border-radius:10px;
-                    font-weight:bold;
-                    background-color:#F9FFF9;">
-                    {comp}
-                </div>
-                """,
-                unsafe_allow_html=True
-            )
+        html += f"""
+        <div style="
+            border:2px solid #4CAF50;
+            padding:20px;
+            min-width:120px;
+            text-align:center;
+            border-radius:10px;
+            font-weight:bold;
+            background-color:#F9FFF9;
+            ">
+            {comp}
+        </div>
+        """
+
+        if i < len(comps) - 1:
+            html += "<div style='font-size:30px; margin:0 15px;'>➡️</div>"
+
+    html += "</div>"
+
+    st.markdown(html, unsafe_allow_html=True)
+
 
 # ---------------- EXPLANATION PANEL ----------------
 def explain_design(design):
